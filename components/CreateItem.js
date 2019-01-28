@@ -43,6 +43,26 @@ class CreateItem extends Component {
         })
     };
 
+    uploadFile = async e => {
+        const files = e.target.files;
+        const data = new FormData();
+        data.append('file', files[0]);
+        data.append('upload_preset', 'sickfits');
+
+        const res = await fetch('https://api.cloudinary.com/v1_1/ddpmxl8zu/image/upload', {
+            method: 'POST',
+            body: data,
+        });
+
+        const file = await res.json();
+        this.setState({
+            image: file.secure_url,
+            largeImage: file.eager[0].secure_url
+        })
+
+
+    };
+
     render() {
         return (
             <Mutation
@@ -62,6 +82,18 @@ class CreateItem extends Component {
                         <h2>Sell an item</h2>
                         <Error error={error}/>
                         <fieldset disabled={loading} aria-busy={loading}>
+                            <label htmlFor="file">
+                                Image
+                                <input
+                                    type="file"
+                                    id="file"
+                                    name="file"
+                                    placeholder="Upload an image"
+                                    required
+                                    onChange={this.uploadFile}
+                                />
+                                {this.state.image && <img src={this.state.image} alt="Upload preview"/>}
+                            </label>
                             <label htmlFor="title">
                                 Title
                                 <input
